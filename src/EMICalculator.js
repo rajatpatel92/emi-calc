@@ -1,7 +1,8 @@
 import { React, useState } from 'react';
-import { Tabs, Tab, Form, Row, Col, Button } from 'react-bootstrap';
-
-import { CommonInput } from './InputControls';
+import { Tabs, Tab } from 'react-bootstrap';
+import EMITab from './EMITab';
+import TenureTab from './TenureTab';
+import PrincipalTab from './PrincipalTab';
 
 const EMICalculator = () => {
 
@@ -23,6 +24,11 @@ const EMICalculator = () => {
 
     //Function to calculate EMI from Principal, ROI and Tenure
     const calculateEMI = () => {
+        //Check if ROI or Tenure are non-zero
+        if (inputROI === 0 || inputTenure === 0) {
+            setEMI(0);
+            return;
+        }
         let monthlyROI = inputROI / 12 / 100;
         let monthlyTenure = inputTenure * 12;
         setEMI(
@@ -36,9 +42,13 @@ const EMICalculator = () => {
 
     //Calculate Tenure from Principal, ROI and EMI
     const calculateTenure = () => {
+        if (inputROI === 0 || inputEMI === 0){
+            setMonthlyTenure(0);
+            setTenure(0);
+            return;
+        }
         let monthlyROI = inputROI / 12 / 100;
-        let monthlyTenure = (Math.log(inputEMI) - 
-                                Math.log(inputEMI - (inputPrincipal * monthlyROI))) / 
+        let monthlyTenure = (Math.log(inputEMI) - Math.log(inputEMI - (inputPrincipal * monthlyROI))) / 
                                 Math.log(1 + monthlyROI);
         setMonthlyTenure(monthlyTenure); //monthly
         setTenure(monthlyTenure / 12);  //yearly
@@ -46,6 +56,11 @@ const EMICalculator = () => {
 
     //Calculate Principal from EMI, ROI and Tenure
     const calculatePrincipal = () => {
+        //Check if ROI or Tenure are non-zero
+        if (inputROI === 0 || inputTenure === 0) {
+            setEMI(0);
+            return;
+        }
         let monthlyROI = inputROI / 12 / 100;
         let monthlyTenure = inputTenure * 12;
         setPrincipal(
@@ -57,181 +72,57 @@ const EMICalculator = () => {
         );
     };
 
+    //Reset All
+    const resetAll = () => {
+        //reset input parameters
+        setInputEMI(0);
+        setInputPrincipal(0);
+        setInputROI(0);
+        setInputTenure(0);
+        setInputMonthlyTenure(0);
+        //reset calculated parameters
+        setEMI(0);
+        setTenure(0);
+        setMonthlyTenure(0);
+        setPrincipal(0);
+    }
+
     //Render UI
     return (
         <>
         <Tabs
             id="controlled-tab"
             activeKey={key}
-            onSelect={(k) => setKey(k)}
-        >
+            onSelect={(k) => setKey(k)}>
         
-        <Tab eventKey="emi" title="EMI">
-            <Form style={{ margin: "20px" }}>
-            <CommonInput
-                inputLabel="Principal"
-                placeHolderName="Principal Amount"
-                inputValue={inputPrincipal}
-                setInputValue={setInputPrincipal}
-            />
-
-            <CommonInput
-                inputLabel="Rate of Interest (%)"
-                placeHolderName="Rate of Interest in %"
-                inputValue={inputROI}
-                setInputValue={setInputROI}
-            />
-
-            <CommonInput
-                inputLabel="Tenure (in Years)"
-                placeHolderName="Tenure in Years"
-                inputValue={inputTenure}
-                setInputValue={setInputTenure}
-                isYearlyTenure="true"
-                setInputMonthlyTenure={setInputMonthlyTenure}                 
-            />
-
-            <CommonInput
-                inputLabel="Tenure (in Months)"
-                placeHolderName="Tenure in Months"
-                inputValue={inputMonthlyTenure}
-                setInputValue={setInputTenure}
-                isYearlyTenure="false"
-                setInputMonthlyTenure={setInputMonthlyTenure}                 
-            />
-
-            <Form.Group as={Row}>
-                <Col sm={{ span: 9, offset: 3 }}>
-                <Button onClick={calculateEMI}>Calculate EMI</Button>
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formEMI">
-                <Form.Label column sm={3}>
-                EMI
-                </Form.Label>
-                <Col sm={9}>
-                <Form.Control 
-                    value={EMI}
-                    type="number" 
-                    placeholder="EMI" 
-                    disabled/>
-                </Col>
-            </Form.Group>
-            </Form>
-        </Tab>
-
-        
-        <Tab eventKey="tenure" title="Tenure">
-        <Form style={{margin: "20px" }}>
-            <CommonInput
-                inputLabel="Principal"
-                placeHolderName="Principal Amount"
-                inputValue={inputPrincipal}
-                setInputValue={setInputPrincipal}/>
-
-            <CommonInput
-                inputLabel="Rate of Interest (%)"
-                placeHolderName="Rate of Interest in %"
-                inputValue={inputROI}
-                setInputValue={setInputROI}/>
-
-            <CommonInput
-                inputLabel="EMI"
-                placeHolderName="EMI"
-                inputValue={inputEMI}
-                setInputValue={setInputEMI}/>
-
-            <Form.Group as={Row}>
-                <Col sm={{ span: 9, offset: 3 }}>
-                <Button onClick={calculateTenure}>Calculate Tenure</Button>
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formTenure">
-                <Form.Label column sm={3}>
-                Tenure (in Months)
-                </Form.Label>
-                <Col sm={9}>
-                <Form.Control 
-                    value={MonthlyTenure}
-                    type="number" 
-                    placeholder="Tenure in Years"
-                    disabled />
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formTenure">
-                <Form.Label column sm={3}>
-                Tenure (in Years)
-                </Form.Label>
-                <Col sm={9}>
-                <Form.Control 
-                    value={Tenure}
-                    type="number" 
-                    placeholder="Tenure in Years"
-                    disabled />
-                </Col>
-            </Form.Group>
+            <Tab eventKey="emi" title="EMI">
+                <EMITab
+                    inputPrincipal={inputPrincipal} setInputPrincipal={setInputPrincipal}
+                    inputROI={inputROI} setInputROI={setInputROI}
+                    inputTenure={inputTenure} setInputTenure={setInputTenure}
+                    inputMonthlyTenure={inputMonthlyTenure} setInputMonthlyTenure={setInputMonthlyTenure}
+                    EMI={EMI} calculateEMI={calculateEMI} resetAll={resetAll} 
+                />
+            </Tab>
             
-            </Form>
-        </Tab>
-
-        
-        <Tab eventKey="principal" title="Principal">
-        <Form style={{margin: "20px" }}>
+            <Tab eventKey="tenure" title="Tenure">
+                <TenureTab
+                    inputPrincipal={inputPrincipal} setInputPrincipal={setInputPrincipal}
+                    inputROI={inputROI} setInputROI={setInputROI}
+                    inputEMI={inputEMI} setInputEMI={setInputEMI}
+                    Tenure={Tenure} MonthlyTenure={MonthlyTenure} calculateTenure={calculateTenure} resetAll={resetAll} 
+                />
+            </Tab>
             
-            <CommonInput
-                inputLabel="EMI"
-                placeHolderName="EMI"
-                inputValue={inputEMI}
-                setInputValue={setInputEMI}/>
-
-            <CommonInput
-                inputLabel="Rate of Interest (%)"
-                placeHolderName="Rate of Interest in %"
-                inputValue={inputROI}
-                setInputValue={setInputROI}/>
-
-            <CommonInput
-                inputLabel="Tenure (in Years)"
-                placeHolderName="Tenure in Years"
-                inputValue={inputTenure}
-                setInputValue={setInputTenure}
-                isYearlyTenure="true"
-                setInputMonthlyTenure={setInputMonthlyTenure}                 
-            />
-
-            <CommonInput
-                inputLabel="Tenure (in Months)"
-                placeHolderName="Tenure in Months"
-                inputValue={inputMonthlyTenure}
-                setInputValue={setInputTenure}
-                isYearlyTenure="false"
-                setInputMonthlyTenure={setInputMonthlyTenure}                 
-            />
-
-            <Form.Group as={Row}>
-                <Col sm={{ span: 9, offset: 3 }}>
-                <Button onClick={calculatePrincipal}>Calculate Principal</Button>
-                </Col>
-            </Form.Group>
-
-            <Form.Group as={Row} controlId="formPrincipal">
-                <Form.Label column sm={3}>
-                Principal
-                </Form.Label>
-                <Col sm={9}>
-                <Form.Control 
-                    value={Principal}
-                    type="number" 
-                    placeholder="Principal Amount" 
-                    disabled/>
-                </Col>
-            </Form.Group>
-
-            </Form>
-        </Tab>
+            <Tab eventKey="principal" title="Principal">
+                <PrincipalTab
+                    inputEMI={inputEMI} setInputEMI={setInputEMI}
+                    inputROI={inputROI} setInputROI={setInputROI}
+                    inputTenure={inputTenure} setInputTenure={setInputTenure}
+                    inputMonthlyTenure={inputMonthlyTenure} setInputMonthlyTenure={setInputMonthlyTenure}
+                    Principal={Principal} calculatePrincipal={calculatePrincipal} resetAll={resetAll} 
+                />
+            </Tab>
         
         </Tabs>
         </>

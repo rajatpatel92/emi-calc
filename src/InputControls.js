@@ -1,7 +1,8 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 
-const CommonInput = ({ inputLabel, placeHolderName, inputValue, setInputValue, isYearlyTenure = null, setInputMonthlyTenure = null }) => {
+const CommonInput = ({ inputLabel, placeHolderName, inputValue, setInputValue, 
+    isYearlyTenure = null, setInputMonthlyTenure = null }) => {
 
     const handleOnChange = (val) => {
         if (isYearlyTenure && setInputMonthlyTenure) {
