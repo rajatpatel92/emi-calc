@@ -14,7 +14,7 @@ const CommonInput = ({ inputLabel, placeHolderName, inputValue, setInputValue,
 
     //Convert Year to Month & vice versa
     const getTenure = (value, isYear) => {
-        if (isYear) {
+        if (isYear === "true") {
             setInputMonthlyTenure(value * 12);
             setInputValue(value);
         } else {
